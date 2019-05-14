@@ -1,16 +1,16 @@
 package com.example.shoutbox.ui.shoutbox
 
 import androidx.lifecycle.ViewModel
-import com.example.shoutbox.api.ShoutboxApi
+import com.example.shoutbox.repository.ShoutboxRepository
 import timber.log.Timber
 
-class ShoutboxViewModel : ViewModel() {
+class ShoutboxViewModel(
+    private val repository: ShoutboxRepository
+) : ViewModel() {
     
     
     fun getMessages() {
         Timber.d("getMessages: started")
-        ShoutboxApi().getMessages().observeForever {
-            Timber.d("getMessages: $it")
-        }
+        repository.getMessages()
     }
 }

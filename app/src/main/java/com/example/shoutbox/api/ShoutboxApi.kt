@@ -1,15 +1,12 @@
 package com.example.shoutbox.api
 
 import androidx.lifecycle.LiveData
-import com.example.shoutbox.db.MessagesEntry
+import com.example.shoutbox.db.MessageEntry
 import com.example.shoutbox.util.LiveDataCallAdapterFactory
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import timber.log.Timber
-import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
 
@@ -18,7 +15,7 @@ const val BASE_URL = "https://tgryl.pl/shoutbox/"
 interface ShoutboxApi {
 
     @GET("messages")
-    fun getMessages(): LiveData<ApiResponse<List<MessagesEntry>>>
+    fun getMessages(): LiveData<ApiResponse<List<MessageEntry>>>
 
 
     companion object {
