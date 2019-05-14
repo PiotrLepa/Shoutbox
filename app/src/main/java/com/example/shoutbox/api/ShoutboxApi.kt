@@ -3,12 +3,16 @@ package com.example.shoutbox.api
 import androidx.lifecycle.LiveData
 import com.example.shoutbox.db.MessageEntry
 import com.example.shoutbox.util.LiveDataCallAdapterFactory
+import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
+import com.google.gson.GsonBuilder
+
+
 
 const val BASE_URL = "https://tgryl.pl/shoutbox/"
 
