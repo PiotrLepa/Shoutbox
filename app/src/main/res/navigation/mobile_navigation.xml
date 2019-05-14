@@ -5,7 +5,10 @@
             app:startDestination="@id/loginFragment">
 
     <fragment android:id="@+id/loginFragment" android:name="com.example.shoutbox.ui.login.LoginFragment"
-              android:label="login_fragment" tools:layout="@layout/login_fragment"/>
+              android:label="login_fragment" tools:layout="@layout/login_fragment">
+        <action android:id="@+id/action_start_shoutbox_fragment" app:destination="@id/shoutboxFragment"
+                app:popUpTo="@+id/shoutboxFragment" app:popUpToInclusive="true"/>
+    </fragment>
     <fragment android:id="@+id/shoutboxFragment" android:name="com.example.shoutbox.ui.shoutbox.ShoutboxFragment"
               android:label="shoutbox_fragment" tools:layout="@layout/shoutbox_fragment"/>
     <fragment android:id="@+id/settingsFragment" android:name="com.example.shoutbox.ui.settings.SettingsFragment"
