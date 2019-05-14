@@ -11,10 +11,6 @@ import com.example.shoutbox.R
 
 class ShoutboxFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = ShoutboxFragment()
-    }
-
     private lateinit var viewModel: ShoutboxViewModel
 
     override fun onCreateView(
@@ -27,7 +23,8 @@ class ShoutboxFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(ShoutboxViewModel::class.java)
-        // TODO: Use the ViewModel
+
+        viewModel.getMessages()
     }
 
 }
