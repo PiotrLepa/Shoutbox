@@ -1,40 +1,43 @@
 package com.example.shoutbox.ui.shoutbox
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.example.shoutbox.db.MessageEntry
+import androidx.lifecycle.viewModelScope
 import com.example.shoutbox.db.MessageInput
 import com.example.shoutbox.repository.ShoutboxRepository
-import timber.log.Timber
+import kotlinx.coroutines.launch
 
 class ShoutboxViewModel(
     private val repository: ShoutboxRepository
 ) : ViewModel() {
 
-    private val shouldRefresh = MutableLiveData<Boolean>()
-    val messages = Transformations
-        .switchMap(shouldRefresh) {
-            return@switchMap repository.getMessages()
-        }
-
-    private val messageToSend = MutableLiveData<MessageInput>()
-    val sentMessageResponse = Transformations
-        .switchMap(messageToSend) {
-            return@switchMap repository.sendMessage(it)
-        }
+    val messages = repository.messages
 
 
     init {
-        getMessages()
+        refreshMessages()
     }
 
-    fun getMessages() {
-        Timber.d("getMessages: started")
-        shouldRefresh.value = true
+    fun refreshMessages() {
+        viewModelScope.launch {
+            repository.getMessages()
+        }
     }
 
     fun sendMessage(message: MessageInput) {
-        messageToSend.value = message
+        viewModelScope.launch {
+            repository.sendMessage(message)
+        }
+    }
+
+    fun updateMessage(messageInput: MessageInput, id: String) {
+        viewModelScope.launch {
+            repository.updateMessage(messageInput, id)
+        }
+    }
+
+    fun deleteMessage(messageId: String) {
+        viewModelScope.launch {
+            repository.deleteMessage(messageId)
+        }
     }
 }

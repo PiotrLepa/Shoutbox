@@ -149,6 +149,7 @@ internal class SwipeController(buttonsActions: SwipeControllerActions) : ItemTou
 
                 if (buttonsActions != null && buttonInstance != null && buttonInstance!!.contains(event.x, event.y)) {
                     if (buttonShowedState === ButtonsState.LEFT_VISIBLE) {
+
                         buttonsActions!!.onLeftClicked(viewHolder.adapterPosition)
                     } else if (buttonShowedState === ButtonsState.RIGHT_VISIBLE) {
                         buttonsActions!!.onRightClicked(viewHolder.adapterPosition)

@@ -9,7 +9,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
 class MessageItem(
-    private val message: MessageEntry
+    val message: MessageEntry
 ) : Item() {
 
     private val dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")

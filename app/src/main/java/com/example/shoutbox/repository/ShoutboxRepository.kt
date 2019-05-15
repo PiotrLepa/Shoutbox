@@ -1,54 +1,48 @@
 package com.example.shoutbox.repository
 
-import androidx.lifecycle.LiveData
-import com.example.shoutbox.AppExecutors
-import com.example.shoutbox.api.ApiResponse
 import com.example.shoutbox.api.ShoutboxApi
 import com.example.shoutbox.db.MessageDao
-import com.example.shoutbox.db.MessageEntry
 import com.example.shoutbox.db.MessageInput
-import com.example.shoutbox.util.wrapper.Resource
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class ShoutboxRepository(
     private val apiService: ShoutboxApi,
-    private val messagesDao: MessageDao,
-    private val appExecutors: AppExecutors
+    private val messagesDao: MessageDao
 ) {
 
-    fun getMessages(): LiveData<Resource<List<MessageEntry>>> {
-        return object : NetworkBoundResource<List<MessageEntry>, List<MessageEntry>>(appExecutors) {
-            override fun saveCallResult(item: List<MessageEntry>) {
-                return messagesDao.insertMessages(item)
-            }
+    val messages by lazy { messagesDao.getMessages() }
 
-            override fun shouldFetch(data: List<MessageEntry>?): Boolean {
-                return true
+    suspend fun getMessages() {
+        withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.getMessages().await()
+                messagesDao.insertMessages(response)
+            } catch (e: Throwable) {
+                Timber.d("getMessages: error $e")
             }
-
-            override fun loadFromDb(): LiveData<List<MessageEntry>> {
-                return messagesDao.getMessages()
-            }
-
-            override fun createCall(): LiveData<ApiResponse<List<MessageEntry>>> {
-                return apiService.getMessages()
-            }
-        }.asLiveData()
+        }
     }
 
-    fun sendMessage(message: MessageInput): LiveData<Resource<MessageEntry>> {
-        return object : NetworkBoundInputResource<MessageEntry, MessageEntry>(appExecutors) {
-            override fun saveCallResult(item: MessageEntry) {
-                messagesDao.insertMessage(item)
-            }
+    suspend fun sendMessage(message: MessageInput) {
+        withContext(Dispatchers.IO) {
+            val response = apiService.sendMessage(message).await()
+            messagesDao.insertMessage(response)
+        }
+    }
 
-            override fun loadFromDb(response: MessageEntry): LiveData<MessageEntry> {
-                return messagesDao.getMessage(response.id)
-            }
+    suspend fun updateMessage(messageInput: MessageInput, id: String) {
+        withContext(Dispatchers.IO) {
+            val response = apiService.updateMessage(messageInput, id).await()
+            messagesDao.insertMessage(response)
+        }
+    }
 
-            override fun createCall(): LiveData<ApiResponse<MessageEntry>> {
-                return apiService.sendMessage(message)
-            }
-        }.asLiveData()
+    suspend fun deleteMessage(messageId : String) {
+        withContext(Dispatchers.IO) {
+            val response = apiService.deleteMessage(messageId).await()
+            messagesDao.deleteMessage(messageId)
+        }
     }
 }

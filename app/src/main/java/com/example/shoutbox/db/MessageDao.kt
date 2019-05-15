@@ -1,10 +1,7 @@
 package com.example.shoutbox.db
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface MessageDao {
@@ -15,9 +12,9 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMessage(message: MessageEntry)
 
-    @Query("SELECT * FROM messages")
+    @Query("SELECT * FROM messages ORDER BY date")
     fun getMessages(): LiveData<List<MessageEntry>>
 
-    @Query("SELECT * FROM messages WHERE id = :id")
-    fun getMessage(id: String): LiveData<MessageEntry>
+    @Query("DELETE FROM messages WHERE id = :id")
+    fun deleteMessage(id: String)
 }

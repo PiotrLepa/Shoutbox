@@ -8,13 +8,12 @@ import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
 import com.google.gson.GsonBuilder
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.PUT
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import kotlinx.coroutines.Deferred
+import retrofit2.http.*
 
 
 const val BASE_URL = "https://tgryl.pl/shoutbox/"
@@ -22,10 +21,18 @@ const val BASE_URL = "https://tgryl.pl/shoutbox/"
 interface ShoutboxApi {
 
     @GET("messages")
-    fun getMessages(): LiveData<ApiResponse<List<MessageEntry>>>
+    fun getMessages(): Deferred<List<MessageEntry>>
 
     @POST("message")
-    fun sendMessage(@Body message: MessageInput): LiveData<ApiResponse<MessageEntry>>
+    fun sendMessage(@Body message: MessageInput): Deferred<MessageEntry>
+
+    @PUT("message/{id}")
+    fun updateMessage(@Body message: MessageInput,
+                      @Path("id") messageId: String
+    ): Deferred<MessageEntry>
+
+    @DELETE("message/{id}")
+    fun deleteMessage(@Path("id") messageId: String): Deferred<MessageEntry>
 
 
     companion object {
@@ -35,7 +42,7 @@ interface ShoutboxApi {
                 .client(getUnsafeOkHttpClient())
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(LiveDataCallAdapterFactory())
+                .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .build()
                 .create(ShoutboxApi::class.java)
         }

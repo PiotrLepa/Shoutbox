@@ -19,14 +19,11 @@ class BaseApplication : Application(), KodeinAware {
 
     override val kodein: Kodein = Kodein.lazy {
         import(androidXModule(this@BaseApplication))
-
-        bind() from singleton { AppExecutors() }
-
         bind() from singleton { ShoutboxDatabase(instance()) }
         bind() from singleton { instance<ShoutboxDatabase>().messageDao() }
 
         bind() from singleton { ShoutboxApi() }
-        bind() from singleton { ShoutboxRepository(instance(), instance(), instance()) }
+        bind() from singleton { ShoutboxRepository(instance(), instance()) }
 
         bind() from provider { ShoutboxViewModelFactory(instance()) }
     }

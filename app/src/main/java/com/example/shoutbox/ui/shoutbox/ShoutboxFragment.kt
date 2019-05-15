@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,7 +17,6 @@ import com.example.shoutbox.db.MessageInput
 import com.example.shoutbox.ui.shoutbox.recyclerView.MessageItem
 import com.example.shoutbox.ui.shoutbox.recyclerView.SwipeController
 import com.example.shoutbox.ui.shoutbox.recyclerView.SwipeControllerActions
-import com.example.shoutbox.util.wrapper.Status
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.shoutbox_fragment.*
@@ -50,7 +48,6 @@ class ShoutboxFragment : Fragment(), KodeinAware {
         setupWidgets()
         setupRecyclerView()
         observeMessages()
-        observeSentMessages()
     }
 
     private fun setupWidgets() {
@@ -67,11 +64,17 @@ class ShoutboxFragment : Fragment(), KodeinAware {
         messagesAdapter = GroupAdapter()
         val swipeController = SwipeController(object : SwipeControllerActions() {
             override fun onLeftClicked(position: Int) {
+                val item = messagesAdapter.getItem(position) as MessageItem
+                val message = item.message
+                val messageInput = MessageInput("changed", message.login)
+                viewModel.updateMessage(messageInput, message.id)
             }
 
             override fun onRightClicked(position: Int) {
+                val item = messagesAdapter.getItem(position) as MessageItem
+                val message = item.message
+                viewModel.deleteMessage(message.id)
             }
-
         })
         ItemTouchHelper(swipeController).attachToRecyclerView(recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
@@ -85,26 +88,12 @@ class ShoutboxFragment : Fragment(), KodeinAware {
 
     private fun observeMessages() {
         viewModel.messages.observe(viewLifecycleOwner, Observer {
-            Timber.d("onActivityCreated: messages status: ${it.status}")
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    messagesAdapter.clear()
-                    messagesAdapter.addAll(it.data!!.map { MessageItem(it) })
-                    recyclerView.smoothScrollToPosition(messagesAdapter.itemCount - 1)
-                }
-                Status.ERROR -> Toast.makeText(context, "Error ${it.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
+            Timber.d("onActivityCreated: messages size: ${it}")
 
-    private fun observeSentMessages() {
-        viewModel.sentMessageResponse.observe(viewLifecycleOwner, Observer {
-            Timber.d("onActivityCreated: messages status: ${it.status}")
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {}
-                Status.ERROR -> Toast.makeText(context, "Error ${it.message}", Toast.LENGTH_SHORT).show()
+            if (it.isNotEmpty()) {
+                messagesAdapter.clear()
+                messagesAdapter.addAll(it.map { MessageItem(it) })
+                recyclerView.smoothScrollToPosition(messagesAdapter.itemCount - 1)
             }
         })
     }
