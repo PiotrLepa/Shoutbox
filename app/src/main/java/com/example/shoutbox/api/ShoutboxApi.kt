@@ -2,6 +2,7 @@ package com.example.shoutbox.api
 
 import androidx.lifecycle.LiveData
 import com.example.shoutbox.db.MessageEntry
+import com.example.shoutbox.db.MessageInput
 import com.example.shoutbox.util.LiveDataCallAdapterFactory
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
@@ -11,7 +12,9 @@ import retrofit2.http.GET
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
 import com.google.gson.GsonBuilder
-
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.PUT
 
 
 const val BASE_URL = "https://tgryl.pl/shoutbox/"
@@ -20,6 +23,9 @@ interface ShoutboxApi {
 
     @GET("messages")
     fun getMessages(): LiveData<ApiResponse<List<MessageEntry>>>
+
+    @POST("message")
+    fun sendMessage(@Body message: MessageInput): LiveData<ApiResponse<MessageEntry>>
 
 
     companion object {

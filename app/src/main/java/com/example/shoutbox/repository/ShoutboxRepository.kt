@@ -6,7 +6,9 @@ import com.example.shoutbox.api.ApiResponse
 import com.example.shoutbox.api.ShoutboxApi
 import com.example.shoutbox.db.MessageDao
 import com.example.shoutbox.db.MessageEntry
+import com.example.shoutbox.db.MessageInput
 import com.example.shoutbox.util.wrapper.Resource
+import kotlinx.coroutines.runBlocking
 
 class ShoutboxRepository(
     private val apiService: ShoutboxApi,
@@ -30,6 +32,22 @@ class ShoutboxRepository(
 
             override fun createCall(): LiveData<ApiResponse<List<MessageEntry>>> {
                 return apiService.getMessages()
+            }
+        }.asLiveData()
+    }
+
+    fun sendMessage(message: MessageInput): LiveData<Resource<MessageEntry>> {
+        return object : NetworkBoundInputResource<MessageEntry, MessageEntry>(appExecutors) {
+            override fun saveCallResult(item: MessageEntry) {
+                messagesDao.insertMessage(item)
+            }
+
+            override fun loadFromDb(response: MessageEntry): LiveData<MessageEntry> {
+                return messagesDao.getMessage(response.id)
+            }
+
+            override fun createCall(): LiveData<ApiResponse<MessageEntry>> {
+                return apiService.sendMessage(message)
             }
         }.asLiveData()
     }
