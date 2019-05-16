@@ -29,6 +29,7 @@ class LoginFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        setHasOptionsMenu(true)
         setupViews()
 
         viewModel.isUserSaved.observe(viewLifecycleOwner, Observer {
@@ -37,6 +38,10 @@ class LoginFragment : Fragment() {
                 openShoutboxFragment()
             }
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
     }
 
     private fun setupViews() {

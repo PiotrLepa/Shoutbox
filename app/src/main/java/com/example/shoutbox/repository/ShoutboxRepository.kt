@@ -16,12 +16,8 @@ class ShoutboxRepository(
 
     suspend fun getMessages() {
         withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.getMessages().await()
-                messagesDao.insertMessages(response)
-            } catch (e: Throwable) {
-                Timber.d("getMessages: error $e")
-            }
+            val response = apiService.getMessages().await()
+            messagesDao.insertMessages(response)
         }
     }
 

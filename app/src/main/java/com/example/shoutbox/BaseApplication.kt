@@ -1,6 +1,7 @@
 package com.example.shoutbox
 
 import android.app.Application
+import com.example.shoutbox.api.ConnectivityInterceptor
 import com.example.shoutbox.api.ShoutboxApi
 import com.example.shoutbox.db.ShoutboxDatabase
 import com.example.shoutbox.repository.ShoutboxRepository
@@ -22,7 +23,8 @@ class BaseApplication : Application(), KodeinAware {
         bind() from singleton { ShoutboxDatabase(instance()) }
         bind() from singleton { instance<ShoutboxDatabase>().messageDao() }
 
-        bind() from singleton { ShoutboxApi() }
+        bind() from singleton { ConnectivityInterceptor(instance()) }
+        bind() from singleton { ShoutboxApi(instance()) }
         bind() from singleton { ShoutboxRepository(instance(), instance()) }
 
         bind() from provider { ShoutboxViewModelFactory(instance()) }

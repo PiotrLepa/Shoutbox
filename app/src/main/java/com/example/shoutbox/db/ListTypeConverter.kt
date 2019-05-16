@@ -1,9 +1,8 @@
 package com.example.shoutbox.db
 
 import androidx.room.TypeConverter
-import com.example.shoutbox.util.fromJson
 import com.google.gson.Gson
-import org.joda.time.DateTime
+import com.google.gson.reflect.TypeToken
 
 object ListTypeConverter {
 
@@ -18,4 +17,6 @@ object ListTypeConverter {
     fun messagesListToString(list: List<MessageEntry>): String {
         return Gson().toJson(list)
     }
+
+    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object: TypeToken<T>() {}.type)
 }

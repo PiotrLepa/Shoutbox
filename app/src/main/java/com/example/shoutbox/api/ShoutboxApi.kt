@@ -1,19 +1,17 @@
 package com.example.shoutbox.api
 
-import androidx.lifecycle.LiveData
 import com.example.shoutbox.db.MessageEntry
 import com.example.shoutbox.db.MessageInput
-import com.example.shoutbox.util.LiveDataCallAdapterFactory
-import com.google.gson.Gson
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.security.cert.X509Certificate
-import javax.net.ssl.*
-import com.google.gson.GsonBuilder
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import kotlinx.coroutines.Deferred
 import retrofit2.http.*
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 
 const val BASE_URL = "https://tgryl.pl/shoutbox/"
@@ -36,10 +34,16 @@ interface ShoutboxApi {
 
 
     companion object {
-        operator fun invoke(): ShoutboxApi {
+        operator fun invoke(
+            connectivityInterceptor: ConnectivityInterceptor
+        ): ShoutboxApi {
+
+            val okHttpClient = getUnsafeOkHttpClientBuilder()
+                .addInterceptor(connectivityInterceptor)
+                .build()
 
             return Retrofit.Builder()
-                .client(getUnsafeOkHttpClient())
+                .client(okHttpClient)
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
@@ -47,7 +51,7 @@ interface ShoutboxApi {
                 .create(ShoutboxApi::class.java)
         }
 
-        private fun getUnsafeOkHttpClient(): OkHttpClient {
+        private fun getUnsafeOkHttpClientBuilder(): OkHttpClient.Builder {
             val trustAllCerts = getUnvalidatedTrustManager()
             val sslContext = SSLContext.getInstance("SSL")
             sslContext.init(null, trustAllCerts, java.security.SecureRandom())
@@ -56,7 +60,6 @@ interface ShoutboxApi {
             return OkHttpClient.Builder()
                 .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
                 .hostnameVerifier { _, _ -> true }
-                .build()
         }
 
         private fun getUnvalidatedTrustManager(): Array<TrustManager> {

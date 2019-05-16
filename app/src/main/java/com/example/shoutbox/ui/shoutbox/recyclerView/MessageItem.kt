@@ -12,7 +12,7 @@ class MessageItem(
     val message: MessageEntry
 ) : Item() {
 
-    private val dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    private val dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm")
 
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.apply {

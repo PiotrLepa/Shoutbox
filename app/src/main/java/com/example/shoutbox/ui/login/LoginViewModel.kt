@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.shoutbox.BaseApplication
-import com.example.shoutbox.USER_NAME_SHARED_PREF
+import com.example.shoutbox.util.USER_NAME_SHARED_PREF
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
