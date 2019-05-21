@@ -2,10 +2,13 @@ package com.example.shoutbox.ui.shoutbox
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -34,6 +37,8 @@ class ShoutboxFragment : Fragment(), KodeinAware {
 
     private lateinit var messagesAdapter: GroupAdapter<ViewHolder>
 
+    private var refreshButton: ImageButton? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,6 +56,19 @@ class ShoutboxFragment : Fragment(), KodeinAware {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.toolbar_shoutbox_menu, menu)
+        setupToolbarRefreshButton(menu)
+    }
+
+    private fun setupToolbarRefreshButton(menu: Menu) {
+        refreshButton = menu.findItem(R.id.refreshChat).actionView as ImageButton
+        refreshButton?.setBackgroundColor(Color.TRANSPARENT)
+        refreshButton?.setImageResource(R.drawable.ic_refresh_32dp)
+        refreshButton?.setOnClickListener {
+            val rotation = AnimationUtils.loadAnimation(context, R.anim.spinner_refresh)
+            refreshButton?.startAnimation(rotation)
+
+            viewModel.refreshMessages()
+        }
     }
 
     private fun setupWidgets() {
@@ -67,7 +85,6 @@ class ShoutboxFragment : Fragment(), KodeinAware {
 
         setupRecyclerView()
     }
-
     private fun setupRecyclerView() {
         messagesAdapter = GroupAdapter()
         recyclerView.layoutManager = LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
@@ -102,6 +119,7 @@ class ShoutboxFragment : Fragment(), KodeinAware {
                 messagesAdapter.clear()
                 messagesAdapter.addAll(it.map { MessageItem(it) })
                 recyclerView.smoothScrollToPosition(messagesAdapter.itemCount - 1)
+                refreshButton?.animation?.cancel()
             }
         })
     }

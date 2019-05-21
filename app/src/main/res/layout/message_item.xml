@@ -20,8 +20,7 @@
                 android:id="@+id/userNameText"
                 android:textStyle="bold"
                 app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"
-                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
-        />
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"/>
         <TextView
                 tools:text="Message"
                 android:layout_width="wrap_content"
