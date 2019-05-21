@@ -1,7 +1,7 @@
 package com.example.shoutbox.ui.shoutbox.recyclerView
 
 import com.example.shoutbox.R
-import com.example.shoutbox.db.MessageEntry
+import com.example.shoutbox.db.model.Message
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import kotlinx.android.synthetic.main.message_item.*
@@ -9,7 +9,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
 class MessageItem(
-    val message: MessageEntry
+    val message: Message
 ) : Item() {
 
     private val dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm")

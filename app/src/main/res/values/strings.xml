@@ -6,4 +6,6 @@
     <string name="message">message</string>
     <string name="chat">Chat</string>
     <string name="refresh">refresh</string>
+    <string name="save">save</string>
+    <string name="new_content">new content</string>
 </resources>

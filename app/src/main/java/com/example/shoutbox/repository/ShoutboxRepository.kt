@@ -2,7 +2,7 @@ package com.example.shoutbox.repository
 
 import com.example.shoutbox.api.ShoutboxApi
 import com.example.shoutbox.db.MessageDao
-import com.example.shoutbox.db.MessageInput
+import com.example.shoutbox.db.model.MessagePost
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -17,20 +17,22 @@ class ShoutboxRepository(
     suspend fun getMessages() {
         withContext(Dispatchers.IO) {
             val response = apiService.getMessages().await()
+            Timber.d("getMessages: response size: ${response.size}")
+            messagesDao.deleteOldMessages()
             messagesDao.insertMessages(response)
         }
     }
 
-    suspend fun sendMessage(message: MessageInput) {
+    suspend fun sendMessage(message: MessagePost) {
         withContext(Dispatchers.IO) {
             val response = apiService.sendMessage(message).await()
             messagesDao.insertMessage(response)
         }
     }
 
-    suspend fun updateMessage(messageInput: MessageInput, id: String) {
+    suspend fun updateMessage(messagePost: MessagePost, id: String) {
         withContext(Dispatchers.IO) {
-            val response = apiService.updateMessage(messageInput, id).await()
+            val response = apiService.updateMessage(messagePost, id).await()
             messagesDao.insertMessage(response)
         }
     }

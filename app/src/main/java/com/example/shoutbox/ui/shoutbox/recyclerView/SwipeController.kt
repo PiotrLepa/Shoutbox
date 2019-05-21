@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE
 import androidx.recyclerview.widget.ItemTouchHelper.Callback.makeMovementFlags
 
 
-internal class SwipeController(buttonsActions: SwipeControllerActions) : ItemTouchHelper.Callback() {
+class SwipeController(buttonsActions: SwipeControllerActions) : ItemTouchHelper.Callback() {
 
     private var swipeBack = false
 
@@ -170,7 +170,7 @@ internal class SwipeController(buttonsActions: SwipeControllerActions) : ItemTou
 
     private fun drawButtons(c: Canvas, viewHolder: RecyclerView.ViewHolder) {
         val buttonWidthWithoutPadding = buttonWidth - 20
-        val corners = 24f
+        val corners = 56f
 
         val itemView = viewHolder.itemView
         val p = Paint()

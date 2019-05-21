@@ -1,7 +1,7 @@
 package com.example.shoutbox.api
 
-import com.example.shoutbox.db.MessageEntry
-import com.example.shoutbox.db.MessageInput
+import com.example.shoutbox.db.model.Message
+import com.example.shoutbox.db.model.MessagePost
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
@@ -19,18 +19,18 @@ const val BASE_URL = "https://tgryl.pl/shoutbox/"
 interface ShoutboxApi {
 
     @GET("messages")
-    fun getMessages(): Deferred<List<MessageEntry>>
+    fun getMessages(): Deferred<List<Message>>
 
     @POST("message")
-    fun sendMessage(@Body message: MessageInput): Deferred<MessageEntry>
+    fun sendMessage(@Body message: MessagePost): Deferred<Message>
 
     @PUT("message/{id}")
-    fun updateMessage(@Body message: MessageInput,
+    fun updateMessage(@Body message: MessagePost,
                       @Path("id") messageId: String
-    ): Deferred<MessageEntry>
+    ): Deferred<Message>
 
     @DELETE("message/{id}")
-    fun deleteMessage(@Path("id") messageId: String): Deferred<MessageEntry>
+    fun deleteMessage(@Path("id") messageId: String): Deferred<Message>
 
 
     companion object {

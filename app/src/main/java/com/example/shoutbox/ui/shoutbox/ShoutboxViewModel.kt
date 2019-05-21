@@ -4,8 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shoutbox.db.model.Message
 import com.example.shoutbox.util.NoConnectivityException
-import com.example.shoutbox.db.MessageInput
+import com.example.shoutbox.db.model.MessagePost
 import com.example.shoutbox.repository.ShoutboxRepository
 import com.example.shoutbox.ui.shoutbox.recyclerView.MessageItem
 import kotlinx.coroutines.Job
@@ -19,6 +20,10 @@ class ShoutboxViewModel(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean>
         get() = _isLoading
+
+    private val _snackbar = MutableLiveData<String>()
+    val snackbar: LiveData<String>
+        get() = _snackbar
 
     val messages = repository.messages
 
@@ -35,16 +40,15 @@ class ShoutboxViewModel(
     fun onSendButtonClicked(message: String, userName: String?) {
         launchDataChange{
             if (userName != null && message.isNotBlank()) {
-                repository.sendMessage(MessageInput(message, userName))
+                repository.sendMessage(MessagePost(message, userName))
             }
         }
     }
 
-    fun onEditButtonClicked(clickedItem: MessageItem) {
+    fun onEditButtonClicked(newContent: String, oldMessage: Message) {
         launchDataChange {
-            val message = clickedItem.message
-            val messageInput = MessageInput("changed", message.login)
-            repository.updateMessage(messageInput, message.id)
+            val messageInput = MessagePost(newContent, oldMessage.login)
+            repository.updateMessage(messageInput, oldMessage.id)
         }
     }
 
@@ -61,10 +65,12 @@ class ShoutboxViewModel(
                 block()
             } catch (e: NoConnectivityException) {
                 Timber.e("launchDataChange: NoConnectivityException $e")
+                _snackbar.value = "No internet connection."
             } catch (e: Throwable) {
                 Timber.e("launchDataChange: Throwable: $e")
+                _snackbar.value = "${e.message}"
             } finally {
-                    _isLoading.value = false
+                _isLoading.value = false
             }
         }
     }

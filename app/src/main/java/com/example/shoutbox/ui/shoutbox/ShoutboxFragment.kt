@@ -20,6 +20,7 @@ import com.example.shoutbox.util.USER_NAME_SHARED_PREF
 import com.example.shoutbox.ui.shoutbox.recyclerView.MessageItem
 import com.example.shoutbox.ui.shoutbox.recyclerView.SwipeController
 import com.example.shoutbox.ui.shoutbox.recyclerView.SwipeControllerActions
+import com.google.android.material.snackbar.Snackbar
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.shoutbox_fragment.*
@@ -48,9 +49,12 @@ class ShoutboxFragment : Fragment(), KodeinAware {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShoutboxViewModel::class.java)
+        viewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(ShoutboxViewModel::class.java)
+        Timber.d("viewmodel: $viewModel")
         setHasOptionsMenu(true)
         setupWidgets()
+        observeLoading()
+        observeSnackbar()
         observeMessages()
     }
 
@@ -64,9 +68,6 @@ class ShoutboxFragment : Fragment(), KodeinAware {
         refreshButton?.setBackgroundColor(Color.TRANSPARENT)
         refreshButton?.setImageResource(R.drawable.ic_refresh_32dp)
         refreshButton?.setOnClickListener {
-            val rotation = AnimationUtils.loadAnimation(context, R.anim.spinner_refresh)
-            refreshButton?.startAnimation(rotation)
-
             viewModel.refreshMessages()
         }
     }
@@ -96,7 +97,7 @@ class ShoutboxFragment : Fragment(), KodeinAware {
         val swipeController = SwipeController(object : SwipeControllerActions() {
             override fun onLeftClicked(position: Int) {
                 val clickedItem = messagesAdapter.getItem(position) as MessageItem
-                viewModel.onEditButtonClicked(clickedItem)
+                showEditContentFragment(clickedItem)
             }
             override fun onRightClicked(position: Int) {
                 val clickedItem = messagesAdapter.getItem(position) as MessageItem
@@ -112,9 +113,27 @@ class ShoutboxFragment : Fragment(), KodeinAware {
         })
     }
 
+    private fun observeLoading() {
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            Timber.d("observeLoading: isLoading: $isLoading")
+            if (isLoading) {
+                val rotation = AnimationUtils.loadAnimation(context, R.anim.spinner_refresh)
+                refreshButton?.startAnimation(rotation)
+            } else {
+                refreshButton?.clearAnimation()
+            }
+        })
+    }
+
+    private fun observeSnackbar() {
+        viewModel.snackbar.observe(viewLifecycleOwner, Observer {
+            Snackbar.make(view!!, it, Snackbar.LENGTH_SHORT).show()
+        })
+    }
+
     private fun observeMessages() {
         viewModel.messages.observe(viewLifecycleOwner, Observer {
-            Timber.d("onActivityCreated: messages size: ${it}")
+            Timber.d("observeMessages: messages size: ${it}")
             if (it.isNotEmpty()) {
                 messagesAdapter.clear()
                 messagesAdapter.addAll(it.map { MessageItem(it) })
@@ -122,6 +141,11 @@ class ShoutboxFragment : Fragment(), KodeinAware {
                 refreshButton?.animation?.cancel()
             }
         })
+    }
+
+    private fun showEditContentFragment(clickedItem: MessageItem) {
+        val editMessageFragment = EditMessageFragment.getInstance(clickedItem.message)
+        fragmentManager?.let { editMessageFragment.show(it, "EditContent") }
     }
 
     private fun getUserName(): String? {
