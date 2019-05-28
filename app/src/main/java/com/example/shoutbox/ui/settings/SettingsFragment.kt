@@ -1,30 +1,28 @@
 package com.example.shoutbox.ui.settings
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.view.*
-import androidx.fragment.app.Fragment
+import androidx.preference.EditTextPreference
+import androidx.preference.PreferenceFragmentCompat
 
 import com.example.shoutbox.R
+import timber.log.Timber
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : PreferenceFragmentCompat() {
 
-    private lateinit var viewModel: SettingsViewModel
+    private lateinit var loginPrefKey: String
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.settings_fragment, container, false)
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.preferences)
+
+        loginPrefKey = getString(R.string.loginPreferenceKey)
+
+        Timber.d("onCreatePreferences: loginPrefKey: $loginPrefKey")
+        val loginPref = findPreference(loginPrefKey) as EditTextPreference
+        val userLogin = getUserLogin()
+        loginPref.text = userLogin
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
-        setHasOptionsMenu(true)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        menu.clear()
+    private fun getUserLogin(): String? {
+        return preferenceManager.sharedPreferences.getString(loginPrefKey, null)
     }
 }
