@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditTextPreference
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:key="@string/loginPreferenceKey"
-            android:icon="@drawable/ic_login_black_24dp"
-            android:dialogIcon="@drawable/ic_login_black_24dp"
-            android:summary="Change your login"
-            android:title="Login"/>
+    <PreferenceCategory
+        android:title="Login">
+
+        <EditTextPreference
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:key="@string/loginPreferenceKey"
+                android:icon="@drawable/ic_login_black_24dp"
+                android:dialogIcon="@drawable/ic_login_black_24dp"
+                android:summary="Change your login"
+                android:title="Login"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Messages auto refresh">
+
+        <ListPreference
+                android:key="@string/messagesRefreshDelayKey"
+                android:title="Refresh delay"
+                android:summary="%s minutes"
+                android:entries="@array/refreshDelay"
+                android:entryValues="@array/refreshDelay"
+                android:defaultValue="5"/>
+
+    </PreferenceCategory>
 </PreferenceScreen>

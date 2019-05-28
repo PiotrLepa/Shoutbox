@@ -54,10 +54,8 @@ class EditMessageFragment : BottomSheetDialogFragment(), KodeinAware {
         saveButton.setOnClickListener {
             Timber.d("onViewCreated: save Button clicked")
             val newContent = newContentInput.text.toString()
-            if (newContent.isNotBlank()) {
-                viewModel.onEditButtonClicked(newContent, selectedMessage)
-                dismiss()
-            }
+            viewModel.onEditButtonClicked(newContent, selectedMessage)
+            dismiss()
         }
     }
 }

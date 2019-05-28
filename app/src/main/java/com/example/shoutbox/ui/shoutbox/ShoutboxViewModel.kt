@@ -14,6 +14,7 @@ import com.example.shoutbox.util.EmptyContentException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.*
 
 class ShoutboxViewModel(
     private val repository: ShoutboxRepository,
@@ -31,7 +32,7 @@ class ShoutboxViewModel(
     val messages = repository.messages
 
     init {
-        refreshMessages()
+        setupMessagesAutoRefresh()
     }
 
     fun refreshMessages() {
@@ -53,8 +54,12 @@ class ShoutboxViewModel(
 
     fun onEditButtonClicked(newContent: String, oldMessage: Message) {
         launchDataChange {
-            val messageInput = MessagePost(newContent, oldMessage.login)
-            repository.updateMessage(messageInput, oldMessage.id)
+            if (newContent.isNotBlank()) {
+                val messageInput = MessagePost(newContent, oldMessage.login)
+                repository.updateMessage(messageInput, oldMessage.id)
+            } else {
+                throw EmptyContentException()
+            }
         }
     }
 
@@ -82,5 +87,17 @@ class ShoutboxViewModel(
                 _isLoading.value = false
             }
         }
+    }
+
+    private fun setupMessagesAutoRefresh() {
+        val timer = Timer()
+        timer.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                Timber.d("setupMessagesAutoRefresh run: called")
+                launchDataChange {
+                    repository.getMessages()
+                }
+            }
+        }, 0, 10000)
     }
 }
