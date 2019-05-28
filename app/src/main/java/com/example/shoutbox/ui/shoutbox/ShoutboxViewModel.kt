@@ -1,11 +1,9 @@
 package com.example.shoutbox.ui.shoutbox
 
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import com.example.shoutbox.db.model.Message
 import com.example.shoutbox.util.NoConnectivityException
 import com.example.shoutbox.db.model.MessagePost
@@ -13,10 +11,10 @@ import com.example.shoutbox.repository.ShoutboxRepository
 import com.example.shoutbox.ui.shoutbox.recyclerView.MessageItem
 import com.example.shoutbox.util.PreferenceProvider
 import com.example.shoutbox.util.EmptyContentException
+import com.example.shoutbox.util.WrongLoginException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.IllegalStateException
 import java.util.*
 
 class ShoutboxViewModel(
@@ -58,10 +56,15 @@ class ShoutboxViewModel(
     }
 
     fun onEditButtonClicked(newContent: String, oldMessage: Message) {
+        Timber.d("onEditButtonClicked started")
         launchDataChange {
             if (newContent.isNotBlank()) {
-                val messageInput = MessagePost(newContent, oldMessage.login)
-                repository.updateMessage(messageInput, oldMessage.id)
+                if (canEditOrDeleteMessage(oldMessage)) {
+                    val messageInput = MessagePost(newContent, oldMessage.login)
+                    repository.updateMessage(messageInput, oldMessage.id)
+                } else {
+                    throw WrongLoginException()
+                }
             } else {
                 throw EmptyContentException()
             }
@@ -69,9 +72,18 @@ class ShoutboxViewModel(
     }
 
     fun onDeleteButtonClicked(clickedItem: MessageItem) {
+        Timber.d("onDeleteButtonClicked started")
         launchDataChange {
-            repository.deleteMessage(clickedItem.message.id)
+            if (canEditOrDeleteMessage(clickedItem.message)) {
+                repository.deleteMessage(clickedItem.message.id)
+            } else {
+                throw WrongLoginException()
+            }
         }
+    }
+
+    private fun canEditOrDeleteMessage(message: Message): Boolean {
+        return prefProvider.getUserName() == message.login
     }
 
     private fun launchDataChange(block: suspend () -> Unit): Job {
@@ -84,7 +96,10 @@ class ShoutboxViewModel(
                 _snackbar.value = "No internet connection."
             } catch (e: EmptyContentException) {
                 Timber.e("launchDataChange: EmptyContentException: $e")
-                _snackbar.value = "Content cannot be empty"
+                _snackbar.value = "Content can not be empty"
+            } catch (e: WrongLoginException) {
+                Timber.e("launchDataChange: WrongLoginException: $e")
+                _snackbar.value = "You can only change your messages"
             } catch (e: Throwable) {
                 Timber.e("launchDataChange: Throwable: $e")
                 _snackbar.value = "${e.message}"
