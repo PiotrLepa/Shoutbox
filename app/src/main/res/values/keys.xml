@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="loginPreferenceKey">loginPreferenceKey</string>
-    <string name="messagesRefreshDelayKey">messagesRefreshDelayKey</string>
+    <string name="autoRefreshDelayKey">autoRefreshDelayKey</string>
+    <string name="shouldAutoRefreshKey">shouldAutoRefreshKey</string>
 </resources>

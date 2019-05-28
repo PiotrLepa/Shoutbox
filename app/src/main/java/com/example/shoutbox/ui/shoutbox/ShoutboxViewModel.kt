@@ -1,9 +1,11 @@
 package com.example.shoutbox.ui.shoutbox
 
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.preference.PreferenceManager
 import com.example.shoutbox.db.model.Message
 import com.example.shoutbox.util.NoConnectivityException
 import com.example.shoutbox.db.model.MessagePost
@@ -14,12 +16,15 @@ import com.example.shoutbox.util.EmptyContentException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.lang.IllegalStateException
 import java.util.*
 
 class ShoutboxViewModel(
     private val repository: ShoutboxRepository,
     private val prefProvider: PreferenceProvider
 ) : ViewModel() {
+
+    private var timer = Timer()
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean>
@@ -31,7 +36,7 @@ class ShoutboxViewModel(
 
     val messages = repository.messages
 
-    init {
+    fun onFragmentStart() {
         setupMessagesAutoRefresh()
     }
 
@@ -90,7 +95,10 @@ class ShoutboxViewModel(
     }
 
     private fun setupMessagesAutoRefresh() {
-        val timer = Timer()
+        Timber.d("setupMessagesAutoRefresh: started")
+        timer.cancel()
+        timer = Timer()
+        val refreshDelay = prefProvider.getAutoRefreshDelayInMillis() ?: return
         timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 Timber.d("setupMessagesAutoRefresh run: called")
@@ -98,6 +106,6 @@ class ShoutboxViewModel(
                     repository.getMessages()
                 }
             }
-        }, 0, 10000)
+        }, 0, refreshDelay)
     }
 }

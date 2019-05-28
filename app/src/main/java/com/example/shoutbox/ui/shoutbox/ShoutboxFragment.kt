@@ -58,6 +58,11 @@ class ShoutboxFragment : Fragment(), KodeinAware {
         observeMessages()
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.onFragmentStart()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.toolbar_shoutbox_menu, menu)
         setupToolbarRefreshButton(menu)
