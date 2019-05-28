@@ -75,13 +75,12 @@ class ShoutboxFragment : Fragment(), KodeinAware {
     private fun setupWidgets() {
         sendButton.setOnClickListener {
             val message = messageInput.text.toString()
-            val userName = getUserName()
             messageInput.apply {
                 clearFocus()
                 hideKeyboard()
                 setText("")
             }
-            viewModel.onSendButtonClicked(message, userName)
+            viewModel.onSendButtonClicked(message)
         }
 
         setupRecyclerView()
@@ -146,11 +145,6 @@ class ShoutboxFragment : Fragment(), KodeinAware {
     private fun showEditContentFragment(clickedItem: MessageItem) {
         val editMessageFragment = EditMessageFragment.getInstance(clickedItem.message)
         fragmentManager?.let { editMessageFragment.show(it, "EditContent") }
-    }
-
-    private fun getUserName(): String? {
-        val sharedPref = context?.getSharedPreferences(USER_NAME_SHARED_PREF, Context.MODE_PRIVATE)
-        return sharedPref?.getString(USER_NAME_SHARED_PREF, null)
     }
 
     private fun View.hideKeyboard() {

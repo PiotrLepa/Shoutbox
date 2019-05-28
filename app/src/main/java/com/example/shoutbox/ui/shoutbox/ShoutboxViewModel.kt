@@ -9,12 +9,15 @@ import com.example.shoutbox.util.NoConnectivityException
 import com.example.shoutbox.db.model.MessagePost
 import com.example.shoutbox.repository.ShoutboxRepository
 import com.example.shoutbox.ui.shoutbox.recyclerView.MessageItem
+import com.example.shoutbox.util.PreferenceProvider
+import com.example.shoutbox.util.EmptyContentException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ShoutboxViewModel(
-    private val repository: ShoutboxRepository
+    private val repository: ShoutboxRepository,
+    private val prefProvider: PreferenceProvider
 ) : ViewModel() {
 
     private val _isLoading = MutableLiveData<Boolean>()
@@ -37,10 +40,13 @@ class ShoutboxViewModel(
         }
     }
 
-    fun onSendButtonClicked(message: String, userName: String?) {
+    fun onSendButtonClicked(message: String) {
         launchDataChange{
+            val userName = prefProvider.getUserName()
             if (userName != null && message.isNotBlank()) {
                 repository.sendMessage(MessagePost(message, userName))
+            } else {
+                throw EmptyContentException()
             }
         }
     }
@@ -66,6 +72,9 @@ class ShoutboxViewModel(
             } catch (e: NoConnectivityException) {
                 Timber.e("launchDataChange: NoConnectivityException $e")
                 _snackbar.value = "No internet connection."
+            } catch (e: EmptyContentException) {
+                Timber.e("launchDataChange: EmptyContentException: $e")
+                _snackbar.value = "Content cannot be empty"
             } catch (e: Throwable) {
                 Timber.e("launchDataChange: Throwable: $e")
                 _snackbar.value = "${e.message}"

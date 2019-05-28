@@ -45,6 +45,8 @@ dependencies {
     //material design
     implementation 'com.google.android.material:material:1.0.0'
 
+    implementation 'androidx.preference:preference:1.0.0'
+
     //navigation architecture
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"

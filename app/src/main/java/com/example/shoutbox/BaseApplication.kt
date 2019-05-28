@@ -5,7 +5,9 @@ import com.example.shoutbox.api.ConnectivityInterceptor
 import com.example.shoutbox.api.ShoutboxApi
 import com.example.shoutbox.db.ShoutboxDatabase
 import com.example.shoutbox.repository.ShoutboxRepository
+import com.example.shoutbox.ui.login.LoginViewModelFactory
 import com.example.shoutbox.ui.shoutbox.ShoutboxViewModelFactory
+import com.example.shoutbox.util.PreferenceProvider
 import net.danlew.android.joda.JodaTimeAndroid
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -27,7 +29,9 @@ class BaseApplication : Application(), KodeinAware {
         bind() from singleton { ShoutboxApi(instance()) }
         bind() from singleton { ShoutboxRepository(instance(), instance()) }
 
-        bind() from provider { ShoutboxViewModelFactory(instance()) }
+        bind() from singleton { PreferenceProvider(instance()) }
+        bind() from provider { LoginViewModelFactory(instance()) }
+        bind() from provider { ShoutboxViewModelFactory(instance(), instance()) }
     }
 
     override fun onCreate() {

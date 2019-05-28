@@ -13,10 +13,17 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.shoutbox.MainActivity
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.x.kodein
+import org.kodein.di.generic.instance
 
 
-class LoginFragment : Fragment() {
+class LoginFragment : Fragment(), KodeinAware {
 
+    override val kodein by kodein()
+
+    private val viewModelFactory: LoginViewModelFactory by instance()
     private lateinit var viewModel: LoginViewModel
 
     override fun onCreateView(
@@ -28,7 +35,7 @@ class LoginFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginViewModel::class.java)
         setHasOptionsMenu(true)
         setupViews()
 
