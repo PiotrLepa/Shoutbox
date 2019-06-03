@@ -34,6 +34,10 @@ class ShoutboxViewModel(
 
     val messages = repository.messages
 
+    init {
+        refreshMessages()
+    }
+
     fun onFragmentStart() {
         setupMessagesAutoRefresh()
     }
@@ -105,6 +109,7 @@ class ShoutboxViewModel(
                 _snackbar.value = "${e.message}"
             } finally {
                 _isLoading.value = false
+                _snackbar.value = ""
             }
         }
     }
@@ -121,6 +126,6 @@ class ShoutboxViewModel(
                     repository.getMessages()
                 }
             }
-        }, 0, refreshDelay)
+        }, refreshDelay, refreshDelay)
     }
 }

@@ -131,7 +131,9 @@ class ShoutboxFragment : Fragment(), KodeinAware {
 
     private fun observeSnackbar() {
         viewModel.snackbar.observe(viewLifecycleOwner, Observer {
-            Snackbar.make(view!!, it, Snackbar.LENGTH_SHORT).show()
+            if (it.isNotBlank()) {
+                Snackbar.make(view!!, it, Snackbar.LENGTH_SHORT).show()
+            }
         })
     }
 
