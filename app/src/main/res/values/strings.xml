@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Shoutbox</string>
+    <string name="shoutbox">shoutbox</string>
+    <string name="login">login</string>
+    <string name="settings">Settings</string>
+    <string name="message">message</string>
+    <string name="chat">Chat</string>
+    <string name="refresh">refresh</string>
+    <string name="save">save</string>
+    <string name="new_content">new content</string>
 </resources>
